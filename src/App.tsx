@@ -143,6 +143,16 @@ export default function App() {
         {/* Content */}
         <div className="relative z-10 pt-24 pb-20 px-5">
           <div className="max-w-xl mx-auto text-center">
+            {/* Profile photo */}
+            <motion.div
+              initial={{ opacity: 0, scale: 0.8 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.5, delay: 0.1, type: 'spring', stiffness: 300 }}
+              className="mx-auto mb-6 w-20 h-20 rounded-full overflow-hidden ring-2 ring-[var(--accent)]/50 shadow-[0_0_40px_rgba(139,108,255,0.2)]"
+            >
+              <img src="/images/profile-main.png" alt="Jack Roberts" className="w-full h-full object-cover" />
+            </motion.div>
+
             {/* Heading */}
             <motion.h1
               initial={{ opacity: 0, y: 20 }}
@@ -341,16 +351,68 @@ export default function App() {
             <PromptOutput prompt={prompt} />
           </motion.section>
 
+          {/* Paste hint */}
+          <motion.div
+            initial={{ opacity: 0 }}
+            whileInView={{ opacity: 1 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.5 }}
+            className="text-center"
+          >
+            <p className="text-sm text-[var(--text-dim)]">
+              Paste this into <span className="text-[var(--text-muted)]">Lovable</span>, <span className="text-[var(--text-muted)]">Bolt</span>, <span className="text-[var(--text-muted)]">v0</span>, or any AI builder
+            </p>
+          </motion.div>
+
+          <Divider />
+
+          {/* Go Deeper — Skool CTA */}
+          <motion.section
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: '-40px' }}
+            transition={{ duration: 0.6 }}
+            className="text-center pt-4 pb-2"
+          >
+            <h3 className="text-2xl font-bold text-white mb-2">Go Deeper</h3>
+            <p className="text-sm text-[var(--text-muted)] mb-6 max-w-sm mx-auto">
+              Join the community for AI systems, automations, and website builds that actually work.
+            </p>
+            <a
+              href="https://www.skool.com/aiautomationsbyjack/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="group inline-block rounded-2xl overflow-hidden border-2 border-[var(--border)] hover:border-[var(--accent)]/50 transition-all duration-300 hover:shadow-[0_0_40px_rgba(139,108,255,0.15)]"
+            >
+              <img
+                src="/images/skool-thumbnail.png"
+                alt="AI Automations by Jack — Skool Community"
+                className="w-full max-w-md transition-transform duration-500 group-hover:scale-[1.03]"
+              />
+            </a>
+            <div className="mt-5">
+              <a
+                href="https://www.skool.com/aiautomationsbyjack/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-[var(--accent)] text-white font-semibold text-sm hover:brightness-110 transition-all duration-200 shadow-[0_4px_24px_rgba(139,108,255,0.3)] hover:shadow-[0_6px_32px_rgba(139,108,255,0.45)]"
+              >
+                Join the Community
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M7 17L17 7"/><path d="M7 7h10v10"/></svg>
+              </a>
+            </div>
+          </motion.section>
+
           {/* Footer */}
           <motion.footer
             initial={{ opacity: 0 }}
             whileInView={{ opacity: 1 }}
             viewport={{ once: true }}
             transition={{ duration: 0.6, delay: 0.2 }}
-            className="text-center pt-2 pb-8"
+            className="text-center pt-6 pb-10"
           >
             <p className="text-sm text-[var(--text-dim)]">
-              Paste this into <span className="text-[var(--text-muted)]">Lovable</span>, <span className="text-[var(--text-muted)]">Bolt</span>, <span className="text-[var(--text-muted)]">v0</span>, or any AI builder
+              Made with <span className="text-sky-400">&#x1F499;</span> by Jack
             </p>
           </motion.footer>
         </div>
