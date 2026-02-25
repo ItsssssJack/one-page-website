@@ -351,20 +351,36 @@ export default function App() {
             <PromptOutput prompt={prompt} />
           </motion.section>
 
-          {/* Paste hint */}
+          {/* ── Paste hint + rainbow transition strip ── */}
           <motion.div
-            initial={{ opacity: 0 }}
-            whileInView={{ opacity: 1 }}
+            initial={{ opacity: 0, y: 10 }}
+            whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            transition={{ duration: 0.5 }}
-            className="text-center"
+            transition={{ duration: 0.6 }}
+            className="text-center space-y-6 py-4"
           >
-            <p className="text-sm text-[var(--text-dim)]">
-              Paste this into <span className="text-[var(--text-muted)]">Lovable</span>, <span className="text-[var(--text-muted)]">Bolt</span>, <span className="text-[var(--text-muted)]">v0</span>, or any AI builder
+            <p className="text-base text-[var(--text-muted)] font-medium">
+              Paste into <span className="text-white">Lovable</span>, <span className="text-white">Bolt</span>, <span className="text-white">AntiGravity AI Studio</span>, <span className="text-white">v0</span>, or any AI builder
             </p>
-          </motion.div>
 
-          <Divider />
+            {/* Rainbow glow strip */}
+            <div className="rainbow-strip mx-auto w-4/5" />
+
+            <p className="text-xs text-[var(--text-dim)] uppercase tracking-[0.2em] font-semibold">
+              Keep scrolling
+            </p>
+
+            {/* Animated down arrow */}
+            <motion.div
+              animate={{ y: [0, 6, 0] }}
+              transition={{ duration: 1.5, repeat: Infinity, ease: 'easeInOut' }}
+              className="flex justify-center"
+            >
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-[var(--accent)]">
+                <path d="M12 5v14" /><path d="m19 12-7 7-7-7" />
+              </svg>
+            </motion.div>
+          </motion.div>
 
           {/* Go Deeper — Skool CTA */}
           <motion.section
@@ -412,7 +428,7 @@ export default function App() {
             className="text-center pt-6 pb-10"
           >
             <p className="text-sm text-[var(--text-dim)]">
-              Made with <span className="text-sky-400">&#x1F499;</span> by Jack
+              Made with <span className="text-cyan-400">&#x1F499;</span> by Jack
             </p>
           </motion.footer>
         </div>

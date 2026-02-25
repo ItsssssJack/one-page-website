@@ -162,3 +162,43 @@ textarea.input-glow { resize: none; }
 .rainbow-border:hover::before {
   opacity: 1;
 }
+
+/* ── Rainbow glow strip ── */
+@keyframes rainbow-slide {
+  0%   { background-position: 0% center; }
+  100% { background-position: 200% center; }
+}
+
+.rainbow-strip {
+  position: relative;
+  height: 2px;
+  border-radius: 2px;
+  background: linear-gradient(
+    90deg,
+    #8b6cff, #ec4899, #f97316, #fbbf24, #34d399, #38bdf8, #8b6cff,
+    #ec4899, #f97316, #fbbf24, #34d399, #38bdf8, #8b6cff
+  );
+  background-size: 200% auto;
+  animation: rainbow-slide 4s linear infinite;
+}
+
+.rainbow-strip::before {
+  content: '';
+  position: absolute;
+  inset: -12px -5% -12px -5%;
+  border-radius: 50%;
+  background: linear-gradient(
+    90deg,
+    rgba(139,108,255,0.25),
+    rgba(236,72,153,0.2),
+    rgba(249,115,22,0.2),
+    rgba(251,191,36,0.15),
+    rgba(52,211,153,0.2),
+    rgba(56,189,248,0.2),
+    rgba(139,108,255,0.25)
+  );
+  background-size: 200% auto;
+  animation: rainbow-slide 4s linear infinite;
+  filter: blur(16px);
+  pointer-events: none;
+}
