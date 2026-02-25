@@ -1,9 +1,10 @@
-import { useState, useCallback } from 'react'
+import { useState, useCallback, useRef } from 'react'
 import { AnimatePresence, motion, LayoutGroup } from 'framer-motion'
 import {
   Sparkles, Users, LayoutGrid, ListOrdered, MessageSquareQuote,
   DollarSign, HelpCircle, Mail, Send, BarChart3,
   Megaphone, PanelBottom, GripVertical, X, Plus,
+  ChevronUp, ChevronDown,
 } from 'lucide-react'
 
 const sectionMeta: Record<string, { icon: React.ReactNode; desc: string }> = {
@@ -31,9 +32,13 @@ interface Props {
 export default function SectionBuilder({ selected, onChange }: Props) {
   const [dragIdx, setDragIdx] = useState<number | null>(null)
   const [overIdx, setOverIdx] = useState<number | null>(null)
+  const [touchDragIdx, setTouchDragIdx] = useState<number | null>(null)
+  const listRef = useRef<HTMLDivElement>(null)
+  const itemRefs = useRef<(HTMLDivElement | null)[]>([])
 
   const available = ALL_SECTIONS.filter((s) => !selected.includes(s))
 
+  /* ── Desktop HTML5 drag ── */
   const handleDragEnd = useCallback(() => {
     if (dragIdx !== null && overIdx !== null && dragIdx !== overIdx) {
       const next = [...selected]
@@ -45,6 +50,49 @@ export default function SectionBuilder({ selected, onChange }: Props) {
     setOverIdx(null)
   }, [dragIdx, overIdx, selected, onChange])
 
+  /* ── Touch drag for mobile ── */
+  const handleTouchStart = useCallback((i: number) => {
+    setTouchDragIdx(i)
+    setOverIdx(i)
+  }, [])
+
+  const handleTouchMove = useCallback((e: React.TouchEvent) => {
+    if (touchDragIdx === null) return
+    const touch = e.touches[0]
+    const els = itemRefs.current
+    for (let i = 0; i < els.length; i++) {
+      const el = els[i]
+      if (!el) continue
+      const rect = el.getBoundingClientRect()
+      if (touch.clientY >= rect.top && touch.clientY <= rect.bottom) {
+        setOverIdx(i)
+        break
+      }
+    }
+  }, [touchDragIdx])
+
+  const handleTouchEnd = useCallback(() => {
+    if (touchDragIdx !== null && overIdx !== null && touchDragIdx !== overIdx) {
+      const next = [...selected]
+      const [item] = next.splice(touchDragIdx, 1)
+      next.splice(overIdx, 0, item)
+      onChange(next)
+    }
+    setTouchDragIdx(null)
+    setOverIdx(null)
+  }, [touchDragIdx, overIdx, selected, onChange])
+
+  /* ── Move up/down buttons (mobile fallback) ── */
+  const moveItem = useCallback((from: number, to: number) => {
+    if (to < 0 || to >= selected.length) return
+    const next = [...selected]
+    const [item] = next.splice(from, 1)
+    next.splice(to, 0, item)
+    onChange(next)
+  }, [selected, onChange])
+
+  const activeDragIdx = touchDragIdx ?? dragIdx
+
   return (
     <LayoutGroup>
       <div className="space-y-6">
@@ -55,15 +103,21 @@ export default function SectionBuilder({ selected, onChange }: Props) {
               <span className="inline-block w-2 h-2 rounded-full bg-emerald-400 pulse" />
               Your page — drag to reorder
             </p>
-            <div className="space-y-2 rounded-2xl bg-[var(--surface)] border border-[var(--border)] p-2.5">
+            <div
+              ref={listRef}
+              className="space-y-2 rounded-2xl bg-[var(--surface)] border border-[var(--border)] p-2.5"
+              onTouchMove={handleTouchMove}
+              onTouchEnd={handleTouchEnd}
+            >
               <AnimatePresence mode="popLayout">
                 {selected.map((name, i) => {
                   const meta = sectionMeta[name] || { icon: <LayoutGrid size={15} />, desc: '' }
-                  const isDragging = dragIdx === i
-                  const isOver = overIdx === i && dragIdx !== null && dragIdx !== i
+                  const isDragging = activeDragIdx === i
+                  const isOver = overIdx === i && activeDragIdx !== null && activeDragIdx !== i
                   return (
                     <motion.div
                       key={name}
+                      ref={(el) => { itemRefs.current[i] = el }}
                       layout
                       initial={{ opacity: 0, y: -10, scale: 0.97 }}
                       animate={{ opacity: isDragging ? 0.35 : 1, y: 0, scale: 1 }}
@@ -82,11 +136,36 @@ export default function SectionBuilder({ selected, onChange }: Props) {
                         }
                       `}
                     >
-                      <GripVertical size={14} className="text-[var(--text-dim)] shrink-0" />
+                      {/* Grip handle — touch starts drag on mobile */}
+                      <span
+                        className="touch-none shrink-0"
+                        onTouchStart={() => handleTouchStart(i)}
+                      >
+                        <GripVertical size={14} className="text-[var(--text-dim)]" />
+                      </span>
                       <span className="text-[var(--accent)] shrink-0">{meta.icon}</span>
                       <div className="flex-1 min-w-0">
                         <span className="text-[14px] font-semibold text-white">{name}</span>
                         <span className="text-xs text-[var(--text-dim)] ml-2.5 hidden sm:inline">{meta.desc}</span>
+                      </div>
+                      {/* Mobile up/down buttons */}
+                      <div className="flex flex-col gap-0.5 sm:hidden shrink-0">
+                        <button
+                          onClick={() => moveItem(i, i - 1)}
+                          disabled={i === 0}
+                          className="w-5 h-5 rounded flex items-center justify-center bg-transparent border-none
+                            text-[var(--text-dim)] disabled:opacity-20 active:text-[var(--accent)] cursor-pointer"
+                        >
+                          <ChevronUp size={12} />
+                        </button>
+                        <button
+                          onClick={() => moveItem(i, i + 1)}
+                          disabled={i === selected.length - 1}
+                          className="w-5 h-5 rounded flex items-center justify-center bg-transparent border-none
+                            text-[var(--text-dim)] disabled:opacity-20 active:text-[var(--accent)] cursor-pointer"
+                        >
+                          <ChevronDown size={12} />
+                        </button>
                       </div>
                       <span className="text-[10px] font-mono text-[var(--text-dim)] tabular-nums shrink-0 w-5 text-center bg-[var(--bg)] rounded-md py-0.5">{i + 1}</span>
                       <motion.button
